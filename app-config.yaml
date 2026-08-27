@@ -223,7 +223,7 @@ catalog:
     - type: file
       target: ../../examples/Newtemplate/template.yaml
       rules:
-        - allow: [Template]
+        - allow: [Newtemplate]
 
     # Local example organizational data
     - type: file
