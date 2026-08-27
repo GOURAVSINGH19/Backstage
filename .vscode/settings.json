@@ -1,3 +1,14 @@
 {
-    "js/ts.tsdk.path": "node_modules\\typescript\\lib"
+    "js/ts.tsdk.path": "node_modules\\typescript\\lib",
+    "yaml.schemas": {
+        "https://json.schemastore.org/backstage-template.json": [
+            "examples/**/template.yaml",
+            "examples/**/template.yml"
+        ],
+        "https://json.schemastore.org/catalog-info.json": [
+            "examples/**/catalog-info.yaml",
+            "examples/**/catalog-info.yml",
+            "**/catalog-info.yaml"
+        ]
+    }
 }

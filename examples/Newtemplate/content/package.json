@@ -1,0 +1,7 @@
+{
+  "name": "${{ values.name }}",
+  "private": false,
+  "version": "1.0.0",
+  "descriptions": "${{ values.descriptions }}",
+  "dependencies": "${{ values.dependencies }}"
+}

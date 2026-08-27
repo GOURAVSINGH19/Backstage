@@ -175,8 +175,20 @@ export class GitlabService {
     if (!res.ok) {
       const body = await res.text().catch(() => '');
       this.logger.error(
-        `GitLab API error ${res.status} ${res.statusText}: ${body}`,
+        `GitLab API error ${res.status} ${res.statusText}: ${body} (url=${url.toString()} baseUrl=${baseUrl} token=${token ? `${token.slice(0, 4)}***` : 'MISSING'})`,
       );
+      if (res.status === 401) {
+        throw new ForwardedError(
+          `GitLab API 401 Unauthorized — token invalid/expired or missing. Set GITLAB_TOKEN env var and ensure gitlab.token / integrations.gitlab[0].token via \${GITLAB_TOKEN} is configured. ${body}`,
+          res as unknown as Error,
+        );
+      }
+      if (res.status === 404) {
+        throw new ForwardedError(
+          `GitLab API 404 Not Found — baseUrl may be wrong (got ${baseUrl}). For gitlab.com use https://gitlab.com/api/v4, for self-hosted set gitlab.baseUrl / integrations.gitlab[0].apiBaseUrl and GITLAB_HOST/GITLAB_API_BASE_URL. Attempted ${url.toString()}. ${body}`,
+          res as unknown as Error,
+        );
+      }
       throw new ForwardedError(
         `GitLab API request failed: ${res.status} ${res.statusText} ${body}`,
         res as unknown as Error,
