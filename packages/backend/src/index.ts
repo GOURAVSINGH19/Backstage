@@ -26,6 +26,11 @@ import {
   createOAuthProviderFactory,
 } from '@backstage/plugin-auth-node';
 import { stringifyEntityRef } from '@backstage/catalog-model';
+import {
+  rbacBackendPlugin,
+  rbacPermissionPolicyModule,
+} from '@internal/backstage-plugin-rbac-backend-backend';
+import { appManagerBackendPlugin } from '@internal/backstage-plugin-app-manager-backend-backend';
 
 const backend = createBackend();
 
@@ -59,10 +64,8 @@ backend.add(import('@backstage/plugin-catalog-backend-module-logs'));
 
 // permission plugin
 backend.add(import('@backstage/plugin-permission-backend'));
-// See https://backstage.io/docs/permissions/getting-started for how to create your own permission policy
-backend.add(
-  import('@backstage/plugin-permission-backend-module-allow-all-policy'),
-);
+// RBAC permission policy — replaces default allow-all policy
+backend.add(rbacPermissionPolicyModule);
 
 // search plugin
 backend.add(import('@backstage/plugin-search-backend'));
@@ -88,7 +91,15 @@ backend.add(import('@backstage/plugin-signals-backend'));
 // mcp actions plugin
 backend.add(import('@backstage/plugin-mcp-actions-backend'));
 
+// RBAC backend HTTP routes
+backend.add(rbacBackendPlugin);
+
+// GitLab backend plugin
 backend.add(import('@internal/backstage-plugin-gitlab-backend-backend'));
+
+// App Manager plugin
+backend.add(appManagerBackendPlugin);
+
 
 const customAuth = createBackendModule({
   // This ID must be exactly "auth" because that's the plugin it targets

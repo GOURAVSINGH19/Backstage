@@ -1,0 +1,48 @@
+# Local development PostgreSQL via Docker
+# Usage:
+#   Start:  docker-compose up -d
+#   Stop:   docker-compose down
+#   Wipe:   docker-compose down -v   (also deletes the DB volume)
+#
+# The Backstage backend connects using the POSTGRES_* vars from .env
+# (host=localhost because the backend runs on the host, not inside Docker).
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: backstage-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"           # host:container — backend connects to localhost:5432
+    environment:
+      POSTGRES_USER: backstage
+      POSTGRES_PASSWORD: backstage
+      POSTGRES_DB: backstage
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # persist data between restarts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U backstage -d backstage"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: backstage-pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"             # open http://localhost:5050 in your browser
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local

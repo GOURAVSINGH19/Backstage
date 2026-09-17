@@ -2,6 +2,9 @@ import { createApp } from '@backstage/frontend-defaults';
 import catalogPlugin from '@backstage/plugin-catalog/alpha';
 import { navModule } from './modules/nav';
 import { homeModule } from './modules/home';
+import { rbacPlugin } from '@internal/backstage-plugin-rbac';
+import gitlabPlugin from '@internal/backstage-plugin-gitlab';
+import { appManagerPlugin } from '@internal/backstage-plugin-app-manager';
 
 import {
   configApiRef,
@@ -21,6 +24,7 @@ const signInPage = SignInPageBlueprint.make({
           <SignInPage
             {...props}
             providers={[
+              'guest',
               {
                 id: 'github',
                 title: 'GitHub',
@@ -50,6 +54,9 @@ const signInPage = SignInPageBlueprint.make({
 export default createApp({
   features: [
     catalogPlugin,
+    gitlabPlugin,
+    rbacPlugin,
+    appManagerPlugin,
     navModule,
     homeModule,
     createFrontendModule({

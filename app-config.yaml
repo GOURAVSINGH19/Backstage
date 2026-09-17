@@ -122,11 +122,23 @@ backend:
     origin: http://localhost:3000
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
-  # This is for local development only, it is not recommended to use this in production
-  # The production database configuration is stored in app-config.production.yaml
+  # Database — SQLite for local dev (zero setup), PostgreSQL for persistence.
+  # To switch to PostgreSQL: fill in POSTGRES_* vars in .env and swap the blocks below.
+  #
+  # SQLite in-memory (no setup required, data lost on restart):
+  # database:
+  #   client: better-sqlite3
+  #   connection: ':memory:'
+  #
+  # PostgreSQL via Docker (run: docker-compose up -d):
   database:
-    client: better-sqlite3
-    connection: ":memory:"
+    client: pg
+    connection:
+      host: ${POSTGRES_HOST}
+      port: ${POSTGRES_PORT}
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      database: ${POSTGRES_DB}
   # see https://backstage.io/docs/ai/mcp-actions#actions-configuration for more details
   actions:
     pluginSources:
@@ -183,6 +195,7 @@ techdocs:
     type: "local" # Alternatives - 'googleGcs' or 'awsS3'. Read documentation for using alternatives.
 
 auth:
+  environment: development
   # see https://backstage.io/docs/auth/ to learn about auth providers
   providers:
     # See https://backstage.io/docs/auth/guest/provider
@@ -231,6 +244,14 @@ catalog:
       rules:
         - allow: [User, Group]
 
+    # GitLab integration demo — Task 2
+    # Registers the ministry-backstage Component, ministry-platform System,
+    # and rbac-backend-api API with GitLab annotations for source linking.
+    - type: file
+      target: ../../examples/gitlab-catalog-entity.yaml
+      rules:
+        - allow: [Component, System, API]
+
     ## Uncomment these lines to add more example data
     # - type: url
     #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
@@ -253,3 +274,9 @@ permission:
 mcpActions:
   name: "My Company Backstage" # defaults to "backstage"
   description: "Tools for managing your software catalog, creating new services from templates, and exploring your developer portal" # optional
+
+rbac:
+  userRoles:
+    user:default/guest: viewer # guest sign-in → viewer
+    user:default/gouravsingh19: platform-admin # GitHub login → admin
+    user:default/viewer1: viewer

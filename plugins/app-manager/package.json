@@ -1,0 +1,38 @@
+{
+  "name": "@internal/backstage-plugin-app-manager",
+  "version": "0.1.0",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "private": true,
+  "backstage": {
+    "role": "frontend-plugin",
+    "pluginId": "app-manager"
+  },
+  "scripts": {
+    "start": "backstage-cli package start",
+    "build": "backstage-cli package build",
+    "lint": "backstage-cli package lint",
+    "test": "backstage-cli package test",
+    "clean": "backstage-cli package clean"
+  },
+  "dependencies": {
+    "@backstage/core-components": "^0.18.13",
+    "@backstage/core-plugin-api": "^1.12.9",
+    "@backstage/frontend-plugin-api": "^0.18.0",
+    "@backstage/theme": "^0.6.5",
+    "@material-ui/core": "^4.12.2",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.61",
+    "react": "^18.0.2",
+    "react-router-dom": "^6.30.2",
+    "react-use": "^17.5.0"
+  },
+  "devDependencies": {
+    "@backstage/cli": "^0.36.5",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^14.0.0"
+  },
+  "files": [
+    "dist"
+  ]
+}

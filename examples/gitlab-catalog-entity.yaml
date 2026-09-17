@@ -1,0 +1,112 @@
+---
+# GitLab catalog entity — demonstrates Task 2 (GitLab catalog integration).
+#
+# This entity represents the Backstage repository itself hosted on GitLab.
+# Replace the values below with your actual GitLab project details:
+#   - metadata.name → your project slug
+#   - metadata.annotations.gitlab.com/project-slug → namespace/project-name
+#   - spec.owner → your team/user name
+#
+# To import a REAL GitLab repo:
+#   1. Set GITLAB_TOKEN in .env with api + read_api scopes.
+#   2. Add the repo URL to catalog.locations in app-config.yaml:
+#        - type: url
+#          target: https://gitlab.com/your-namespace/your-repo/-/raw/main/catalog-info.yaml
+#
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ministry-backstage
+  title: Ministry Backstage Portal
+  description: >
+    Internal developer portal built on Backstage. Hosts the RBAC plugin,
+    GitLab integration, and the software catalog for the Ministry platform.
+  labels:
+    tier: "platform"
+  annotations:
+    # GitLab integration — links the entity to the GitLab project.
+    # The Backstage GitLab catalog module reads this annotation to display
+    # pipeline status, MR count, and source links.
+    gitlab.com/project-slug: "gourav-singh/ministry"
+    # Shows the last pipeline status badge in the entity page
+    gitlab.com/project-id: "1"
+    # Links back to the repository
+    backstage.io/source-location: "url:https://gitlab.com/gourav-singh/ministry"
+    backstage.io/techdocs-ref: "dir:."
+spec:
+  type: service
+  lifecycle: experimental
+  owner: guests
+  system: examples
+---
+# System grouping the GitLab-integrated components
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: ministry-platform
+  description: Ministry internal developer platform system
+spec:
+  owner: guests
+---
+# API exposed by the RBAC backend plugin
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: rbac-backend-api
+  title: RBAC Backend API
+  description: >
+    Role-based access control API. Provides /rbac/me, /rbac/users,
+    /rbac/resources (create), and /rbac/resources/:name (delete).
+    All routes require a valid Backstage user token.
+  annotations:
+    gitlab.com/project-slug: "gourav-singh/ministry"
+    backstage.io/source-location: "url:https://gitlab.com/gourav-singh/ministry"
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: guests
+  system: ministry-platform
+  definition: |
+    openapi: "3.0.3"
+    info:
+      title: RBAC Backend API
+      version: "0.1.0"
+    paths:
+      /api/rbac-backend/rbac/me:
+        get:
+          summary: Get current user role and permissions
+          responses:
+            "200":
+              description: User role info
+            "401":
+              description: Unauthorized
+      /api/rbac-backend/rbac/users:
+        get:
+          summary: List user-to-role assignments
+          responses:
+            "200":
+              description: User list
+            "403":
+              description: Forbidden
+      /api/rbac-backend/rbac/resources:
+        post:
+          summary: Create a resource (developer + admin)
+          responses:
+            "201":
+              description: Created
+            "403":
+              description: Forbidden
+      /api/rbac-backend/rbac/resources/{name}:
+        delete:
+          summary: Delete a resource (admin only)
+          parameters:
+            - in: path
+              name: name
+              required: true
+              schema:
+                type: string
+          responses:
+            "200":
+              description: Deleted
+            "403":
+              description: Forbidden

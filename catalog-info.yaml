@@ -2,12 +2,19 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: ministry
-  description: An example of a Backstage application.
-  # Example for optional annotations
-  # annotations:
-  #   github.com/project-slug: backstage/backstage
-  #   backstage.io/techdocs-ref: dir:.
+  title: Ministry Backstage Portal
+  description: >
+    Internal developer portal built on Backstage. Hosts the RBAC plugin,
+    GitLab integration, and the software catalog for the Ministry platform.
+  annotations:
+    # GitLab integration — links this entity to its GitLab repository.
+    # Requires @backstage/plugin-catalog-backend-module-gitlab to show
+    # pipeline status and MR count directly on the entity page.
+    gitlab.com/project-slug: gouravsingh19/ministry
+    backstage.io/source-location: "url:https://gitlab.com/gouravsingh19/ministry"
+    backstage.io/techdocs-ref: dir:.
 spec:
-  type: website
-  owner: john@example.com
+  type: service
+  owner: guests
   lifecycle: experimental
+  system: examples

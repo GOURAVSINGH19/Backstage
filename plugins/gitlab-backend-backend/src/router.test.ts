@@ -83,4 +83,60 @@ describe('createRouter', () => {
       .set('Authorization', mockCredentials.none.header());
     expect(response.status).toBe(401);
   });
+
+  it('should return 500 when GitLab token is invalid (401 from GitLab)', async () => {
+    // Simulate GitLab returning 401 — invalid or expired token
+    // const { NotFoundError } = await import('@backstage/errors');
+    const { ForwardedError } = await import('@backstage/errors');
+    const gitlabUnauthorized = {
+      listProjects: jest.fn().mockRejectedValue(
+        new ForwardedError(
+          'GitLab API 401 Unauthorized — token invalid/expired or missing.',
+          new Error('401'),
+        ),
+      ),
+      getProject: jest.fn(),
+    } as unknown as import('./services/GitlabService').GitlabService;
+
+    const router2 = await createRouter({
+      httpAuth: mockServices.httpAuth(),
+      todoList,
+      gitlabService: gitlabUnauthorized,
+      logger: mockServices.logger.mock(),
+    });
+    const app2 = express();
+    app2.use(router2);
+    app2.use(mockErrorHandler());
+
+    const response = await request(app2).get('/gitlab-projects');
+    // ForwardedError maps to 500; the message must NOT expose the raw token
+    expect(response.status).toBeGreaterThanOrEqual(400);
+    expect(JSON.stringify(response.body)).not.toMatch(/glpat-/i);
+    expect(JSON.stringify(response.body)).not.toMatch(/ghp_/i);
+  });
+
+  it('should return 404 when GitLab project is not found', async () => {
+    const { NotFoundError } = await import('@backstage/errors');
+    const gitlabNotFound = {
+      listProjects: jest.fn(),
+      getProject: jest.fn().mockRejectedValue(
+        new NotFoundError('GitLab project 9999 not found'),
+      ),
+    } as unknown as import('./services/GitlabService').GitlabService;
+
+    const router3 = await createRouter({
+      httpAuth: mockServices.httpAuth(),
+      todoList,
+      gitlabService: gitlabNotFound,
+      logger: mockServices.logger.mock(),
+    });
+    const app3 = express();
+    app3.use(router3);
+    app3.use(mockErrorHandler());
+
+    const response = await request(app3).get('/gitlab-projects/9999');
+    expect(response.status).toBe(404);
+    // Response must not leak token or baseUrl credentials
+    expect(JSON.stringify(response.body)).not.toMatch(/glpat-/i);
+  });
 });

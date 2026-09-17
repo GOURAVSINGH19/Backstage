@@ -1,0 +1,1 @@
+export { appManagerBackendPlugin } from './plugin';
