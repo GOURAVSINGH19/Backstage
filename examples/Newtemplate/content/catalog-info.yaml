@@ -1,8 +1,14 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: "${{ values.name }}"
+  name: ${{ values.name | dump }}
+  description: ${{ values.description | dump }}
+  annotations:
+    backstage.io/techdocs-ref: dir:.
+    app-manager.io/enabled: "true"
+    rbac.io/enabled: "true"
+    gitlab.com/project-slug: "gourav-singh/${{ values.name }}"
 spec:
   type: service
-  owner: "{{ values.owner }}"
+  owner: ${{ values.owner | dump }}
   lifecycle: experimental

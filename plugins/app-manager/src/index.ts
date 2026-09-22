@@ -1,4 +1,10 @@
 export { appManagerPlugin } from './plugin';
+export {
+  rootRouteRef,
+  createApplicationRouteRef,
+  applicationDetailsRouteRef,
+  serviceDetailsRouteRef,
+} from './routes';
 export { appManagerApiRef } from './api/appManagerApiRef';
 export type { AppManagerApi } from './api/appManagerApiRef';
 export type {

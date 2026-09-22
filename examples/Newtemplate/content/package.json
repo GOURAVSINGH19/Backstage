@@ -1,7 +1,11 @@
 {
   "name": "${{ values.name }}",
-  "private": false,
   "version": "1.0.0",
-  "descriptions": "${{ values.descriptions }}",
-  "dependencies": "${{ values.dependencies }}"
+  "description": "Scaffolded service component with GitLab integration",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.js"
+  }
 }
+
+

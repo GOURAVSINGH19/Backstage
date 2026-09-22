@@ -93,7 +93,7 @@ const SVC_TABLE = 'app_manager_services';
 // ── EnvironmentStore ──────────────────────────────────────────────────────────
 
 export class EnvironmentStore {
-  private constructor(private readonly db: any) {}
+  private constructor(private readonly db: any) { }
 
   static async create(database: DatabaseService): Promise<EnvironmentStore> {
     const client = await database.getClient();

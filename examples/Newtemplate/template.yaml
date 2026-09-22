@@ -2,19 +2,24 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 
 metadata:
-  name: example-nodejs-template
-  title: Example Node.js Template
-  description: An example template for the scaffolder that creates a simple Node.js service
+  name: my-new-template
+  title: Custom Plugin & GitHub Service Template
+  description: Scaffolds a new service component, creates a GitHub repository, and enables custom plugin integrations (App Manager, RBAC, GitLab).
   tags:
-    - example
+    - github
+    - custom-plugins
+    - nodejs
+    - recommended
 
 spec:
   owner: user:guest
   type: service
   parameters:
-    - title: Fill in some steps
+    - title: Component Information
       required:
         - name
+        - owner
+        - description
       properties:
         name:
           title: Name
@@ -22,66 +27,95 @@ spec:
           description: Unique name of the component
           ui:field: EntityNamePicker
           ui:autofocus: true
-    - title: Choose a location
+        description:
+          title: Description
+          type: string
+          description: A short description of the component
+          default: "Service component with custom plugin integrations"
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+              - User
+    - title: Custom Plugin Integrations
+      properties:
+        enableAppManager:
+          title: Enable App Manager Plugin
+          type: boolean
+          default: true
+          description: Adds App Manager annotations and backend integration configuration
+        enableRbac:
+          title: Enable RBAC Access Control
+          type: boolean
+          default: true
+          description: Configures Role-Based Access Control policies for this service
+        enableGitlab:
+          title: Enable GitLab Annotations & CI/CD
+          type: boolean
+          default: false
+          description: Adds GitLab project annotations for source linking and pipeline monitoring
+    - title: Choose Repository Location
       required:
         - repoUrl
       properties:
         repoUrl:
           title: Repository Location
           type: string
+          description: Select target GitHub organization and repository name
           ui:field: RepoUrlPicker
           ui:options:
             allowedHosts:
               - github.com
 
-  # These steps are executed in the scaffolder backend, using data that we gathered
-  # via the parameters above.
   steps:
-    # Each step executes an action, in this case one templates files into the working directory.
     - id: fetch-base
-      name: Fetch Base
+      name: Fetch Base Template
       action: fetch:template
       input:
         url: ./content
         values:
           name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          owner: ${{ parameters.owner }}
+          enableAppManager: ${{ parameters.enableAppManager }}
+          enableRbac: ${{ parameters.enableRbac }}
+          enableGitlab: ${{ parameters.enableGitlab }}
 
-    # This step publishes the contents of the working directory to GitHub.
-    # If you or your organization prefer another default branch name over 'main'
-    # you can change that here.
     - id: publish
-      name: Publish
+      name: Publish to GitHub
       action: publish:github
       input:
-        description: This is ${{ parameters.name }}
+        description: ${{ parameters.description }}
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: "main"
+        protectDefaultBranch: false
 
-    # The final step is to register our new component in the catalog.
     - id: register
-      name: Register
+      name: Register Component in Catalog
       action: catalog:register
       input:
         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
         catalogInfoPath: "/catalog-info.yaml"
 
-    # Let's notify the user that the template has completed using the Notification action
     - id: notify
-      name: Notify
+      name: Send Notification
       action: notification:send
       input:
         recipients: entity
         entityRefs:
           - user:default/guest
-        title: "Template executed"
-        info: "Your template has been executed"
+        title: "Repository and Component Created Successfully"
+        info: "Your repository '${{ parameters.name }}' has been created on GitHub and registered in Backstage."
         severity: "normal"
 
-  # Outputs are displayed to the user after a successful execution of the template.
   output:
     links:
-      - title: Repository
+      - title: GitHub Repository
         url: ${{ steps['publish'].output.remoteUrl }}
-      - title: Open in catalog
+      - title: View Component in Catalog
         icon: catalog
         entityRef: ${{ steps['register'].output.entityRef }}

@@ -21,9 +21,8 @@ import useAsync from 'react-use/lib/useAsync';
 import { useNavigate } from 'react-router-dom';
 import Alert from '@material-ui/lab/Alert';
 import { appManagerApiRef } from '../../api/appManagerApiRef';
-import { Application, CreateApplicationInput } from '../../api/types';
+import { Application } from '../../api/types';
 import { ApplicationCard } from './ApplicationCard';
-import { CreateApplicationDialog } from './CreateApplicationDialog';
 import { DeleteApplicationDialog } from './DeleteApplicationDialog';
 
 export function ApplicationListPage() {
@@ -31,7 +30,6 @@ export function ApplicationListPage() {
   const navigate = useNavigate();
 
   const [search, setSearch] = useState('');
-  const [createOpen, setCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -40,20 +38,6 @@ export function ApplicationListPage() {
   const { value, loading, error } = useAsync(
     () => api.listApplications(search || undefined),
     [refresh, search],
-  );
-
-  const handleCreate = useCallback(
-    async (input: CreateApplicationInput) => {
-      try {
-        await api.createApplication(input);
-        setSuccessMsg(`Application "${input.name}" created successfully`);
-        setRefresh(r => r + 1);
-      } catch (err: any) {
-        setErrorMsg(err.message || 'Failed to create application');
-        throw err;
-      }
-    },
-    [api],
   );
 
   const handleDelete = useCallback(
@@ -74,7 +58,7 @@ export function ApplicationListPage() {
 
   return (
     <Page themeId="tool">
-      <Header title="Applications" subtitle="Manage your applications and their services" />
+      <Header title="Projects" subtitle="Manage your projects and their services" />
       <Content>
         {successMsg && (
           <Box mb={2}>
@@ -112,9 +96,9 @@ export function ApplicationListPage() {
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
-            onClick={() => setCreateOpen(true)}
+            onClick={() => navigate('/app-manager/create')}
           >
-            Create Application
+            Create Project
           </Button>
         </Box>
 
@@ -136,7 +120,7 @@ export function ApplicationListPage() {
                       variant="outlined"
                       color="primary"
                       startIcon={<AddIcon />}
-                      onClick={() => setCreateOpen(true)}
+                      onClick={() => navigate('/app-manager/create')}
                     >
                       Create Application
                     </Button>
@@ -159,12 +143,6 @@ export function ApplicationListPage() {
             )}
           </>
         )}
-
-        <CreateApplicationDialog
-          open={createOpen}
-          onClose={() => setCreateOpen(false)}
-          onSubmit={handleCreate}
-        />
 
         <DeleteApplicationDialog
           open={Boolean(deleteTarget)}

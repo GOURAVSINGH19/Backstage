@@ -13,6 +13,7 @@ import { appManagerApiRef } from './api/appManagerApiRef';
 import { AppManagerClient } from './api/AppManagerClient';
 import { rootRouteRef } from './routes';
 import { ApplicationListPage } from './components/ApplicationList/ApplicationListPage';
+import { CreateApplicationPage } from './components/CreateApplication/CreateApplicationPage';
 import { ApplicationDetailsPage } from './components/ApplicationDetails/ApplicationDetailsPage';
 import { ServiceDetailsPage } from './components/ServiceDetails/ServiceDetailsPage';
 
@@ -38,6 +39,7 @@ export const appManagerPageExtension = PageBlueprint.make({
     loader: async () => (
       <Routes>
         <Route path="/" element={<ApplicationListPage />} />
+        <Route path="/create" element={<CreateApplicationPage />} />
         <Route path="/:id" element={<ApplicationDetailsPage />} />
         <Route path="/:id/services" element={<ApplicationDetailsPage />} />
         <Route path="/:id/environments" element={<ApplicationDetailsPage />} />

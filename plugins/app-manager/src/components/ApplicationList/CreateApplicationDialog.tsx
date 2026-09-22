@@ -93,6 +93,22 @@ export function CreateApplicationDialog({ open, onClose, onSubmit }: Props) {
     try {
       await onSubmit({ name: name.trim(), key, description, owner: owner.trim(), type, repository, tags });
       handleClose();
+    } catch (err: any) {
+      const status = err.status ?? err.statusCode ?? err.response?.status;
+      const rawMsg = err.body?.error?.message || err.message || '';
+      const isConflict =
+        status === 409 ||
+        err.name === 'ConflictError' ||
+        rawMsg.includes('409') ||
+        rawMsg.toLowerCase().includes('already exists') ||
+        rawMsg.toLowerCase().includes('conflict');
+
+      if (isConflict) {
+        setErrors(prev => ({
+          ...prev,
+          key: `Application key '${key}' already exists. Please choose a unique key.`,
+        }));
+      }
     } finally {
       setSubmitting(false);
     }

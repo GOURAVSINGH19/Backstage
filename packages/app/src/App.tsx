@@ -54,7 +54,7 @@ const signInPage = SignInPageBlueprint.make({
 export default createApp({
   features: [
     catalogPlugin,
-    gitlabPlugin,
+    // gitlabPlugin,
     rbacPlugin,
     appManagerPlugin,
     navModule,

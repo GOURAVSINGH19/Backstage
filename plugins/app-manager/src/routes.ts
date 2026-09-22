@@ -4,6 +4,12 @@ export const rootRouteRef = createRouteRef({
   id: 'app-manager',
 });
 
+export const createApplicationRouteRef = createSubRouteRef({
+  id: 'app-manager.create-application',
+  parent: rootRouteRef,
+  path: '/create',
+});
+
 export const applicationDetailsRouteRef = createSubRouteRef({
   id: 'app-manager.application-details',
   parent: rootRouteRef,
@@ -15,3 +21,4 @@ export const serviceDetailsRouteRef = createSubRouteRef({
   parent: rootRouteRef,
   path: '/services/:id',
 });
+

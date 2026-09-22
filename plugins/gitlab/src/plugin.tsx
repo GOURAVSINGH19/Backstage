@@ -4,15 +4,19 @@ import {
 } from '@backstage/frontend-plugin-api';
 
 import { rootRouteRef } from './routes';
+import { Route, Routes } from 'react-router';
+import { ViewPage } from './components/Viewpage';
+import { GitlabProjects } from './components/GitlabProjects';
 
-export const page = PageBlueprint.make({
+const page = PageBlueprint.make({
   params: {
     path: '/gitlab',
     routeRef: rootRouteRef,
-    loader: () =>
-      import('./components/TodoPage').then(m => (
-        <m.TodoPage />
-      )),
+    loader: async () =>
+      <Routes>
+        <Route path='/' element={<GitlabProjects />} />
+        <Route path="/:id" element={<ViewPage />} />
+      </Routes>
   },
 });
 

@@ -10,10 +10,19 @@
 // This fixes "where env not set" — Backstage resolves ${GITHUB_TOKEN} etc. from process.env
 import dotenv from 'dotenv';
 import path from 'path';
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
-// also try repo root one level up if running from dist
-dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
-dotenv.config(); // fallback to cwd/.env
+
+// Load dynamic env vars from repo root .env before any config is read
+[
+  path.resolve(__dirname, '../../../.env'),
+  path.resolve(__dirname, '../../.env'),
+  path.resolve(process.cwd(), '../../.env'),
+  path.resolve(process.cwd(), '../.env'),
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(process.cwd(), '../../examples/Newtemplate/.env'),
+  path.resolve(__dirname, '../../../examples/Newtemplate/.env'),
+].forEach(envPath => {
+  dotenv.config({ path: envPath, override: true });
+});
 
 import { createBackend } from '@backstage/backend-defaults';
 import {
