@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Ingress
+metadata:
+  name: ${{ values.name }}
+  title: ${{ values.name }}
+  description: Ingress for host ${{ values.host }} (${{ values.ingressClass }})
+  tags:
+    - kubernetes
+    - ingress
+    - networking
+    - ${{ values.ingressClass }}
+spec:
+  type: kubernetes-ingress
+  owner: user:default/guest
+  system: infrastructure-platform

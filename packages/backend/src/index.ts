@@ -40,6 +40,11 @@ import {
   rbacPermissionPolicyModule,
 } from '@internal/backstage-plugin-rbac-backend-backend';
 import { appManagerBackendPlugin } from '@internal/backstage-plugin-app-manager-backend-backend';
+import {
+  addclusterPlugin,
+  addclusterScaffolderModule,
+  addclusterCatalogModule,
+} from '@internal/backstage-plugin-addcluster-backend';
 
 const backend = createBackend();
 
@@ -109,6 +114,10 @@ backend.add(import('@internal/backstage-plugin-gitlab-backend-backend'));
 // App Manager plugin
 backend.add(appManagerBackendPlugin);
 
+// Infrastructure backend plugin, custom actions, and Catalog entity sync
+backend.add(addclusterPlugin);
+backend.add(addclusterScaffolderModule);
+backend.add(addclusterCatalogModule);
 
 const customAuth = createBackendModule({
   // This ID must be exactly "auth" because that's the plugin it targets

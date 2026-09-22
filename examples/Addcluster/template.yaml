@@ -1,0 +1,97 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: add-kubernetes-cluster
+  title: Add Kubernetes Cluster
+  description: >
+    Register or provision a Kubernetes cluster in the platform inventory.
+    Stores cluster details and kubeconfig securely in the PostgreSQL database.
+  tags:
+    - kubernetes
+    - cluster
+    - infrastructure
+    - cloud
+
+spec:
+  owner: user:guest
+  type: infrastructure
+
+  parameters:
+    - title: Cluster Details
+      required:
+        - name
+        - provider
+        - region
+        - environment
+      properties:
+        name:
+          title: Cluster Name / ID
+          type: string
+          description: Unique identifier for this cluster (e.g. prod-gke-us-east, dev-eks-eu-west).
+          pattern: '^[a-z0-9][a-z0-9\-]*[a-z0-9]$'
+          ui:autofocus: true
+
+        provider:
+          title: Cloud / Cluster Provider
+          type: string
+          default: custom-k8s
+          enum:
+            - aws-eks
+            - gcp-gke
+            - azure-aks
+            - minikube
+            - custom-k8s
+          enumNames:
+            - "AWS — Elastic Kubernetes Service (EKS)"
+            - "Google Cloud — Kubernetes Engine (GKE)"
+            - "Azure — Kubernetes Service (AKS)"
+            - "Minikube / Kind (Local)"
+            - "Custom / On-Premise Kubernetes"
+
+        region:
+          title: Region
+          type: string
+          default: us-east-1
+          description: Cloud region where cluster is located.
+
+        environment:
+          title: Environment
+          type: string
+          default: development
+          enum:
+            - development
+            - staging
+            - production
+
+    - title: Cluster Credentials
+      required:
+        - kubeconfig
+      properties:
+        kubeconfig:
+          title: Kubeconfig (Base64)
+          type: string
+          description: Base64-encoded content of your cluster kubeconfig file.
+          ui:widget: textarea
+          ui:options:
+            rows: 8
+
+  steps:
+    - id: register-cluster
+      name: Register Cluster in Platform Inventory
+      action: infrastructure:cluster:register
+      input:
+        name: ${{ parameters.name }}
+        provider: ${{ parameters.provider }}
+        region: ${{ parameters.region }}
+        environment: ${{ parameters.environment }}
+        kubeconfig: ${{ parameters.kubeconfig }}
+        externalClusterRef: ${{ parameters.externalClusterRef }}
+        apiEndpoint: ${{ parameters.apiEndpoint }}
+
+  output:
+    text:
+      - title: Cluster Registered
+        content: |
+          Cluster `${{ parameters.name }}` (${{ parameters.provider }}) has been registered in the database.
+          Operation ID: `${{ steps['register-cluster'].output.operationId }}`
+          Cluster ID: `${{ steps['register-cluster'].output.clusterId }}`

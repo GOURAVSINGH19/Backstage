@@ -1,5 +1,6 @@
 import { createApp } from '@backstage/frontend-defaults';
 import catalogPlugin from '@backstage/plugin-catalog/alpha';
+import scaffolderPlugin from '@backstage/plugin-scaffolder/alpha';
 import { navModule } from './modules/nav';
 import { homeModule } from './modules/home';
 import { rbacPlugin } from '@internal/backstage-plugin-rbac';
@@ -14,6 +15,37 @@ import {
 import { SignInPageBlueprint } from '@backstage/plugin-app-react';
 import { SignInPage } from '@backstage/core-components';
 import { createFrontendModule } from '@backstage/frontend-plugin-api';
+
+import {
+  ClusterPickerExtension,
+  NamespacePickerExtension,
+  NamespacePickerWithCreateExtension,
+} from './components/InfrastructurePickers';
+import {
+  ClusterNamespacesExtension,
+  ClusterIngressesExtension,
+  ClusterGatewaysExtension,
+} from './components/InfrastructureEntityTabs';
+
+// Create a frontend module to register the infrastructure picker field extensions
+const infrastructurePickersModule = createFrontendModule({
+  pluginId: 'scaffolder',
+  extensions: [
+    ClusterPickerExtension,
+    NamespacePickerExtension,
+    NamespacePickerWithCreateExtension,
+  ],
+});
+
+// Create a frontend module to register custom entity tabs on catalog entity pages
+const infrastructureCatalogTabsModule = createFrontendModule({
+  pluginId: 'catalog',
+  extensions: [
+    ClusterNamespacesExtension,
+    ClusterIngressesExtension,
+    ClusterGatewaysExtension,
+  ],
+});
 
 const signInPage = SignInPageBlueprint.make({
   params: {
@@ -45,7 +77,7 @@ const signInPage = SignInPageBlueprint.make({
             message: 'Sign in using GitHub',
             apiRef: githubAuthApiRef,
           }}
-        />
+      />
       );
     },
   },
@@ -54,7 +86,10 @@ const signInPage = SignInPageBlueprint.make({
 export default createApp({
   features: [
     catalogPlugin,
-    // gitlabPlugin,
+    scaffolderPlugin,
+    infrastructurePickersModule,  // Register custom ClusterPicker, NamespacePicker fields
+    infrastructureCatalogTabsModule, // Register Namespaces, Ingresses, API Gateways tabs on Cluster pages
+    gitlabPlugin,        // provides /gitlab AND /infrastructure pages
     rbacPlugin,
     appManagerPlugin,
     navModule,

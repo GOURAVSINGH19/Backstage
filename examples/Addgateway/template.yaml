@@ -1,0 +1,105 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: add-api-gateway
+  title: Add API / Ingress Gateway
+  description: >
+    Configure an API Gateway (Kubernetes Gateway API, Envoy, Kong, Istio) and route traffic to backend services.
+  tags:
+    - kubernetes
+    - gateway
+    - api-gateway
+    - networking
+    - infrastructure
+
+spec:
+  owner: user:guest
+  type: infrastructure
+
+  parameters:
+    - title: Gateway Details
+      required:
+        - clusterId
+        - namespaceId
+        - gatewayName
+        - implementation
+      properties:
+        clusterId:
+          title: Target Cluster
+          type: string
+          description: Select target cluster from platform inventory.
+          ui:field: ClusterPicker
+
+        namespaceId:
+          title: Target Namespace
+          type: string
+          description: Select target namespace from platform inventory.
+          ui:field: NamespacePickerWithCreate
+
+        gatewayName:
+          title: Gateway Name
+          type: string
+          description: Unique name for Gateway instance (e.g. main-gateway).
+
+        implementation:
+          title: Gateway Implementation
+          type: string
+          default: k8s-gateway-api
+          enum:
+            - k8s-gateway-api
+            - kong
+            - envoy-gateway
+            - istio-ingressgateway
+
+    - title: Initial Route Configuration
+      required:
+        - routeName
+        - serviceName
+        - servicePort
+      properties:
+        routeName:
+          title: Route Name
+          type: string
+          description: Name of the route (e.g. api-v1-route).
+
+        serviceName:
+          title: Target Service Name
+          type: string
+          description: Kubernetes service receiving routed traffic.
+
+        servicePort:
+          title: Target Service Port
+          type: number
+          default: 8080
+
+        matchPath:
+          title: Path Match Prefix
+          type: string
+          default: /api
+
+        tlsRef:
+          title: TLS Listener Secret Ref
+          type: string
+
+  steps:
+    - id: create-gateway
+      name: Create Gateway and Route
+      action: infrastructure:gateway:create
+      input:
+        clusterId: ${{ parameters.clusterId }}
+        namespaceId: ${{ parameters.namespaceId }}
+        gatewayName: ${{ parameters.gatewayName }}
+        implementation: ${{ parameters.implementation }}
+        routeName: ${{ parameters.routeName }}
+        serviceName: ${{ parameters.serviceName }}
+        servicePort: ${{ parameters.servicePort }}
+        matchPath: ${{ parameters.matchPath }}
+        tlsRef: ${{ parameters.tlsRef }}
+
+  output:
+    text:
+      - title: Gateway Configured
+        content: |
+          API Gateway `${{ parameters.gatewayName }}` (${{ parameters.implementation }}) configured with route `${{ parameters.routeName }}`.
+          Operation ID: `${{ steps['create-gateway'].output.operationId }}`
+          Gateway ID: `${{ steps['create-gateway'].output.gatewayId }}`

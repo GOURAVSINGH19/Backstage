@@ -1,0 +1,102 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: add-kubernetes-ingress
+  title: Add Kubernetes Ingress
+  description: >
+    Expose a Service through an Ingress controller with host, path, and TLS routing rules.
+  tags:
+    - kubernetes
+    - ingress
+    - networking
+    - infrastructure
+
+spec:
+  owner: user:guest
+  type: infrastructure
+
+  parameters:
+    - title: Ingress Configuration
+      required:
+        - clusterId
+        - namespaceId
+        - name
+        - ingressClass
+        - host
+        - serviceName
+        - servicePort
+      properties:
+        clusterId:
+          title: Target Cluster
+          type: string
+          description: Select target cluster from platform inventory.
+          ui:field: ClusterPicker
+
+        namespaceId:
+          title: Target Namespace
+          type: string
+          description: Select target namespace from platform inventory.
+          ui:field: NamespacePickerWithCreate
+
+        name:
+          title: Ingress Name
+          type: string
+          description: Name of the Ingress resource (e.g. app-ingress).
+
+        ingressClass:
+          title: Ingress Class
+          type: string
+          default: nginx
+          enum:
+            - nginx
+            - traefik
+            - alb
+            - istio
+
+        host:
+          title: Hostname
+          type: string
+          description: Domain name for routing (e.g. app.example.com).
+
+        serviceName:
+          title: Backend Service Name
+          type: string
+          description: Target Kubernetes Service name (e.g. my-service).
+
+        servicePort:
+          title: Backend Service Port
+          type: number
+          default: 80
+
+        path:
+          title: URL Path Prefix
+          type: string
+          default: /
+
+        tlsRef:
+          title: TLS Certificate Secret Name
+          type: string
+          description: Optional Secret name containing TLS certificate.
+
+  steps:
+    - id: create-ingress
+      name: Create Ingress Configuration
+      action: infrastructure:ingress:create
+      input:
+        clusterId: ${{ parameters.clusterId }}
+        namespaceId: ${{ parameters.namespaceId }}
+        name: ${{ parameters.name }}
+        ingressClass: ${{ parameters.ingressClass }}
+        host: ${{ parameters.host }}
+        serviceName: ${{ parameters.serviceName }}
+        servicePort: ${{ parameters.servicePort }}
+        path: ${{ parameters.path }}
+        tlsRef: ${{ parameters.tlsRef }}
+
+  output:
+    text:
+      - title: Ingress Created
+        content: |
+          Ingress `${{ parameters.name }}` created for `${{ parameters.host }}`.
+          Operation ID: `${{ steps['create-ingress'].output.operationId }}`
+          Ingress ID: `${{ steps['create-ingress'].output.ingressId }}`

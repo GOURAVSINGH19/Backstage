@@ -1,0 +1,11 @@
+{
+  "name": "${{ values.name }}",
+  "version": "1.0.0",
+  "description": "Add Cluster",
+  "private": true,
+  "scripts": {
+    "start": "node src/index.ts"
+  }
+}
+
+

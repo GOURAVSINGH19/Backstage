@@ -1,0 +1,60 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: add-kubernetes-namespace
+  title: Add Kubernetes Namespace
+  description: >
+    Create and register a Kubernetes namespace inside an existing cluster in the platform inventory.
+  tags:
+    - kubernetes
+    - namespace
+    - infrastructure
+
+spec:
+  owner: user:guest
+  type: infrastructure
+
+  parameters:
+    - title: Namespace Details
+      required:
+        - clusterId
+        - namespaceName
+        - environment
+      properties:
+        clusterId:
+          title: Target Cluster
+          type: string
+          description: Select target cluster from platform inventory.
+          ui:field: ClusterPicker
+
+        namespaceName:
+          title: Namespace Name
+          type: string
+          description: Kubernetes namespace name (lowercase, alphanumeric, hyphens).
+          pattern: '^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'
+
+        environment:
+          title: Environment
+          type: string
+          default: development
+          enum:
+            - development
+            - staging
+            - production
+
+  steps:
+    - id: create-namespace
+      name: Create Namespace
+      action: infrastructure:namespace:create
+      input:
+        clusterId: ${{ parameters.clusterId }}
+        namespaceName: ${{ parameters.namespaceName }}
+        environment: ${{ parameters.environment }}
+
+  output:
+    text:
+      - title: Namespace Created
+        content: |
+          Namespace `${{ parameters.namespaceName }}` created in cluster `${{ parameters.clusterId }}`.
+          Operation ID: `${{ steps['create-namespace'].output.operationId }}`
+          Namespace ID: `${{ steps['create-namespace'].output.namespaceId }}`

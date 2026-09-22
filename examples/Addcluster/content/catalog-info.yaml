@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Cluster
+metadata:
+  name: ${{ values.name }}
+  title: ${{ values.title }}
+  description: ${{ values.description }}
+  tags:
+    - cluster
+    - ${{ values.provider }}
+    - ${{ values.environment }}
+    - kubernetes
+  annotations:
+    backstage.io/kubernetes-id: ${{ values.name }}
+    backstage.io/kubernetes-api-url: ${{ values.apiUrl | dump }}
+spec:
+  type: kubernetes-cluster
+  owner: ${{ values.owner }}
+  system: platform

@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Gateway
+metadata:
+  name: ${{ values.gatewayName }}
+  title: ${{ values.gatewayName }}
+  description: API Gateway ${{ values.gatewayName }} (${{ values.implementation }})
+  tags:
+    - kubernetes
+    - gateway
+    - api-gateway
+    - ${{ values.implementation }}
+spec:
+  type: api-gateway
+  owner: user:default/guest
+  system: infrastructure-platform

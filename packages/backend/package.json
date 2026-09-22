@@ -44,6 +44,7 @@
     "@backstage/plugin-signals-backend": "^0.3.18",
     "@backstage/plugin-techdocs-backend": "^2.2.3",
     "@backstage/plugin-user-settings-backend": "^0.4.6",
+    "@internal/backstage-plugin-addcluster-backend": "workspace:^",
     "@internal/backstage-plugin-app-manager-backend-backend": "workspace:^",
     "@internal/backstage-plugin-gitlab-backend-backend": "workspace:^",
     "@internal/backstage-plugin-rbac-backend-backend": "workspace:^",

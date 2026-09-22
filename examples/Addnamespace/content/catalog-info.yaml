@@ -1,0 +1,14 @@
+apiVersion: backstage.io/v1alpha1
+kind: Namespace
+metadata:
+  name: ${{ values.namespaceName }}
+  title: ${{ values.namespaceName }}
+  description: Kubernetes namespace ${{ values.namespaceName }} on cluster ${{ values.clusterId }}
+  tags:
+    - kubernetes
+    - namespace
+    - ${{ values.environment }}
+spec:
+  type: kubernetes-namespace
+  owner: user:default/guest
+  system: infrastructure-platform

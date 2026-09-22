@@ -139,6 +139,17 @@ backend:
       user: ${POSTGRES_USER}
       password: ${POSTGRES_PASSWORD}
       database: ${POSTGRES_DB}
+  # Plugin-specific databases (each plugin gets its own database)
+  plugins:
+    addcluster:
+      database:
+        client: pg
+        connection:
+          host: ${POSTGRES_HOST}
+          port: ${POSTGRES_PORT}
+          user: ${POSTGRES_USER}
+          password: ${POSTGRES_PASSWORD}
+          database: backstage_plugin_addcluster
   # see https://backstage.io/docs/ai/mcp-actions#actions-configuration for more details
   actions:
     pluginSources:
@@ -221,17 +232,36 @@ catalog:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
   rules:
-    - allow: [Component, System, API, Resource, Location, Group, User, Template]
+    - allow: [Component, System, API, Resource, Location, Group, User, Template, Cluster, Clusters, Namespace, Ingress, Gateway]
   locations:
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
       target: ../../examples/entities.yaml
 
     # Local example template
+    # - type: file
+    #   target: ../../examples/template/template.yaml
+    #   rules:
+    #     - allow: [Template]
     - type: file
-      target: ../../examples/template/template.yaml
+      target: ../../examples/Addcluster/template.yaml
       rules:
-        - allow: [Template]
+        - allow: [Template, Cluster, Clusters, Resource]
+
+    - type: file
+      target: ../../examples/Addnamespace/template.yaml
+      rules:
+        - allow: [Template, Namespace]
+
+    - type: file
+      target: ../../examples/Addingress/template.yaml
+      rules:
+        - allow: [Template, Ingress]
+
+    - type: file
+      target: ../../examples/Addgateway/template.yaml
+      rules:
+        - allow: [Template, Gateway]
 
     # New template
     - type: file

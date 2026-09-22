@@ -6,12 +6,14 @@ import { createAppManagerRouter } from './router';
 import { createEnvironmentRouter } from './environmentRouter';
 import { createPipelineRouter } from './pipelineRouter';
 import { createDeploymentRouter } from './deploymentRouter';
+import { createClusterRouter } from './clusterRouter';
 import { ApplicationStore } from './db/ApplicationStore';
 import { ServiceStore } from './db/ServiceStore';
 import { EnvironmentStore } from './db/EnvironmentStore';
 import { PipelineStore } from './db/PipelineStore';
 import { DeploymentStore } from './db/DeploymentStore';
 import { MetricsStore } from './db/MetricsStore';
+import { ClusterStore } from './db/ClusterStore';
 
 export const appManagerBackendPlugin = createBackendPlugin({
   pluginId: 'app-manager',
@@ -32,6 +34,7 @@ export const appManagerBackendPlugin = createBackendPlugin({
         let pipelineStore: PipelineStore;
         let deploymentStore: DeploymentStore;
         let metricsStore: MetricsStore;
+        let clusterStore: ClusterStore;
 
         try {
           applicationStore = await ApplicationStore.create(database);
@@ -46,6 +49,8 @@ export const appManagerBackendPlugin = createBackendPlugin({
           logger.info('App Manager: DeploymentStore ready');
           metricsStore = await MetricsStore.create(database);
           logger.info('App Manager: MetricsStore ready');
+          clusterStore = await ClusterStore.create(database);
+          logger.info('App Manager: ClusterStore ready (cluster_manager_clusters table)');
         } catch (err) {
           logger.error(`App Manager plugin failed to initialize DB stores: ${err}`);
           logger.error(`Stack: ${(err as Error).stack ?? 'no stack'}`);
@@ -67,7 +72,8 @@ export const appManagerBackendPlugin = createBackendPlugin({
               serviceStore,
             }),
           );
-          logger.info('App Manager HTTP routes registered at /api/app-manager');
+          httpRouter.use(await createClusterRouter({ httpAuth, logger, clusterStore }));
+          logger.info('App Manager HTTP routes registered at /api/app-manager (includes /clusters)');
         } catch (err) {
           logger.error(`App Manager plugin failed to register routes: ${err}`);
           throw err;

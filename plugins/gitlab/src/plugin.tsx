@@ -3,12 +3,14 @@ import {
   PageBlueprint,
 } from '@backstage/frontend-plugin-api';
 
-import { rootRouteRef } from './routes';
+import { rootRouteRef, infraRouteRef } from './routes';
 import { Route, Routes } from 'react-router';
 import { ViewPage } from './components/Viewpage';
 import { GitlabProjects } from './components/GitlabProjects';
+import { InfrastructureDashboard } from './components/InfrastructureDashboard/InfrastructureDashboard';
 
-const page = PageBlueprint.make({
+// ── GitLab projects page (/ gitlab) ──────────────────────────────────────────
+const gitlabPage = PageBlueprint.make({
   params: {
     path: '/gitlab',
     routeRef: rootRouteRef,
@@ -20,10 +22,23 @@ const page = PageBlueprint.make({
   },
 });
 
+// ── Infrastructure dashboard (/infrastructure) ────────────────────────────────
+const infraPage = PageBlueprint.make({
+  name: 'infrastructure',
+  params: {
+    path: '/infrastructure',
+    routeRef: infraRouteRef,
+    loader: async () => <InfrastructureDashboard />,
+  },
+});
+
 export const gitlabPlugin = createFrontendPlugin({
   pluginId: 'gitlab',
-  extensions: [page],
+  extensions: [gitlabPage, infraPage],
   routes: {
     root: rootRouteRef,
-  }
+    infrastructure: infraRouteRef,
+  },
 });
+
+export default gitlabPlugin;

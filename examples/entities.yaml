@@ -7,6 +7,23 @@ metadata:
 spec:
   owner: guests
 ---
+# Infrastructure platform system — owns all clusters, namespaces, ingresses, gateways
+# registered via the Scaffolder templates (addcluster-backend plugin).
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: infrastructure-platform
+  title: Infrastructure Platform
+  description: >
+    Kubernetes clusters, namespaces, ingress controllers, and API gateways
+    registered through the Backstage Scaffolder. Managed by the addcluster backend plugin.
+  tags:
+    - kubernetes
+    - infrastructure
+    - platform
+spec:
+  owner: guests
+---
 # https://backstage.io/docs/features/software-catalog/descriptor-format#kind-component
 apiVersion: backstage.io/v1alpha1
 kind: Component
