@@ -47,6 +47,7 @@
     "@internal/backstage-plugin-addcluster-backend": "workspace:^",
     "@internal/backstage-plugin-app-manager-backend-backend": "workspace:^",
     "@internal/backstage-plugin-gitlab-backend-backend": "workspace:^",
+    "@internal/backstage-plugin-multitenant-backend": "workspace:^",
     "@internal/backstage-plugin-rbac-backend-backend": "workspace:^",
     "app": "link:../app",
     "better-sqlite3": "^12.0.0",

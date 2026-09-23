@@ -44,6 +44,7 @@
     "@backstage/ui": "^0.17.1",
     "@internal/backstage-plugin-app-manager": "workspace:^",
     "@internal/backstage-plugin-gitlab": "workspace:^",
+    "@internal/backstage-plugin-multitenant": "workspace:^",
     "@internal/backstage-plugin-rbac": "workspace:^",
     "@internal/backstage-plugin-test": "workspace:^",
     "@internal/backstage-plugin-testing": "workspace:^",

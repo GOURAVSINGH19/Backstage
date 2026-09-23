@@ -212,6 +212,10 @@ auth:
     # See https://backstage.io/docs/auth/guest/provider
     guest:
       dangerouslyAllowOutsideDevelopment: true
+    github:
+      development:
+        clientId: ${GITHUB_CLIENT_ID}
+        clientSecret: ${GITHUB_CLIENT_SECRET}
   # see https://backstage.io/docs/ai/mcp-actions#client-id-metadata-documents
   # to learn more about client id metadata documents
   clientIdMetadataDocuments:
@@ -311,3 +315,34 @@ rbac:
     user:default/guest: viewer # guest sign-in → viewer
     user:default/gouravsingh19: platform-admin # GitHub login → admin
     user:default/viewer1: viewer
+
+# ── Multi-Tenancy ────────────────────────────────────────────────────────────
+# Maps Backstage user names (the "name" portion of user:default/<name>) to
+# tenant IDs.  The backend plugin reads this as documentation only — the
+# actual mapping lives in plugins/multitenant-backend/src/tenantData.ts and
+# is enforced server-side from the authenticated user's token.
+#
+# To add a real GitHub user, find your user:default/<name> via
+#   GET /api/multitenant/me   (after signing in with GitHub)
+# then add the entry here AND in tenantData.ts → USER_TENANT_MAP.
+#
+# Development demo users:
+#   user-a  →  company-a  (sign in as guest and query will show no tenant;
+#                           to demo, add your GitHub username to company-a below)
+#   user-b  →  company-b
+#
+# Example GitHub user assignments (uncomment and replace with real usernames):
+#   alice  →  company-a
+#   bob    →  company-b
+multitenant:
+  tenants:
+    company-a:
+      displayName: "Company A"
+    company-b:
+      displayName: "Company B"
+  # Static user→tenant mapping (mirrors tenantData.ts for documentation purposes)
+  userTenantMap:
+    user-a: company-a
+    user-b: company-b
+    # Add your GitHub username below to assign yourself to a tenant, e.g.:
+    # gouravsingh19: company-a

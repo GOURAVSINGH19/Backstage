@@ -45,6 +45,7 @@ import {
   addclusterScaffolderModule,
   addclusterCatalogModule,
 } from '@internal/backstage-plugin-addcluster-backend';
+import { multitenantPlugin } from '@internal/backstage-plugin-multitenant-backend';
 
 const backend = createBackend();
 
@@ -118,6 +119,9 @@ backend.add(appManagerBackendPlugin);
 backend.add(addclusterPlugin);
 backend.add(addclusterScaffolderModule);
 backend.add(addclusterCatalogModule);
+
+// Multi-tenant backend — tenant-isolated project data at /api/multitenant/*
+backend.add(multitenantPlugin);
 
 const customAuth = createBackendModule({
   // This ID must be exactly "auth" because that's the plugin it targets

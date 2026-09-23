@@ -6,13 +6,20 @@ import { homeModule } from './modules/home';
 import { rbacPlugin } from '@internal/backstage-plugin-rbac';
 import gitlabPlugin from '@internal/backstage-plugin-gitlab';
 import { appManagerPlugin } from '@internal/backstage-plugin-app-manager';
+import {
+  multitenantPlugin,
+  TenantProvider,
+} from '@internal/backstage-plugin-multitenant';
 
 import {
   configApiRef,
   githubAuthApiRef,
   useApi,
 } from '@backstage/core-plugin-api';
-import { SignInPageBlueprint } from '@backstage/plugin-app-react';
+import {
+  AppRootWrapperBlueprint,
+  SignInPageBlueprint,
+} from '@backstage/plugin-app-react';
 import { SignInPage } from '@backstage/core-components';
 import { createFrontendModule } from '@backstage/frontend-plugin-api';
 
@@ -27,7 +34,7 @@ import {
   ClusterGatewaysExtension,
 } from './components/InfrastructureEntityTabs';
 
-// Create a frontend module to register the infrastructure picker field extensions
+// ── Infrastructure scaffolder field pickers ───────────────────────────────────
 const infrastructurePickersModule = createFrontendModule({
   pluginId: 'scaffolder',
   extensions: [
@@ -37,7 +44,7 @@ const infrastructurePickersModule = createFrontendModule({
   ],
 });
 
-// Create a frontend module to register custom entity tabs on catalog entity pages
+// ── Infrastructure catalog entity tabs ───────────────────────────────────────
 const infrastructureCatalogTabsModule = createFrontendModule({
   pluginId: 'catalog',
   extensions: [
@@ -47,6 +54,7 @@ const infrastructureCatalogTabsModule = createFrontendModule({
   ],
 });
 
+// ── Sign-in page ──────────────────────────────────────────────────────────────
 const signInPage = SignInPageBlueprint.make({
   params: {
     loader: async () => props => {
@@ -77,26 +85,38 @@ const signInPage = SignInPageBlueprint.make({
             message: 'Sign in using GitHub',
             apiRef: githubAuthApiRef,
           }}
-      />
+        />
       );
     },
   },
+});
+
+// ── TenantProvider wraps the whole authenticated app shell ────────────────────
+// AppRootWrapperBlueprint is the correct extension point for a React context
+// provider that needs to wrap the entire app tree (sidebar + pages).
+const tenantRootWrapper = AppRootWrapperBlueprint.make({
+  params: {
+    component: ({ children }) => <TenantProvider>{children}</TenantProvider>,
+  },
+});
+
+const tenantUiModule = createFrontendModule({
+  pluginId: 'app',
+  extensions: [tenantRootWrapper, signInPage],
 });
 
 export default createApp({
   features: [
     catalogPlugin,
     scaffolderPlugin,
-    infrastructurePickersModule,  // Register custom ClusterPicker, NamespacePicker fields
-    infrastructureCatalogTabsModule, // Register Namespaces, Ingresses, API Gateways tabs on Cluster pages
-    gitlabPlugin,        // provides /gitlab AND /infrastructure pages
+    infrastructurePickersModule,
+    infrastructureCatalogTabsModule,
+    gitlabPlugin,
     rbacPlugin,
     appManagerPlugin,
+    multitenantPlugin,
     navModule,
     homeModule,
-    createFrontendModule({
-      pluginId: 'app',
-      extensions: [signInPage],
-    }),
+    tenantUiModule,
   ],
 });
